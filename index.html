@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DRS AI | Next Gen Drug Recommender</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            dark: '#0f172a',    /* Deep Slate Background */
+                            card: '#1e293b',    /* Lighter Slate for cards */
+                            primary: '#10B981', /* Emerald Green */
+                            accent: '#0EA5E9',  /* Sky Blue */
+                            text: '#f1f5f9'     /* Off-white text */
+                        }
+                    },
+                    animation: {
+                        blob: "blob 7s infinite"
+                    },
+                    keyframes: {
+                        blob: {
+                            "0%": { transform: "translate(0px, 0px) scale(1)" },
+                            "33%": { transform: "translate(30px, -50px) scale(1.1)" },
+                            "66%": { transform: "translate(-20px, 20px) scale(0.9)" },
+                            "100%": { transform: "translate(0px, 0px) scale(1)" }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Base Styles */
+        body { 
+            background-color: #0f172a; 
+            color: #f1f5f9; 
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden; 
+        }
+        
+        /* Glassmorphism Effect */
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7); /* Slate 800 with opacity */
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        
+        /* New Gradient Text (Green to Blue) */
+        .gradient-text {
+            background: linear-gradient(135deg, #34d399 0%, #38bdf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Loading Spinner */
+        .loader-spinner {
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-left-color: #10B981; /* Emerald */
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    </style>
+</head>
+<body class="selection:bg-brand-primary selection:text-white">
+
+    <div class="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-0 left-1/4 w-96 h-96 bg-brand-primary/20 rounded-full mix-blend-screen filter blur-3xl opacity-20 animate-blob"></div>
+        <div class="absolute top-0 right-1/4 w-96 h-96 bg-brand-accent/20 rounded-full mix-blend-screen filter blur-3xl opacity-20 animate-blob" style="animation-delay: 2s"></div>
+        <div class="absolute -bottom-8 left-1/3 w-96 h-96 bg-brand-primary/20 rounded-full mix-blend-screen filter blur-3xl opacity-20 animate-blob" style="animation-delay: 4s"></div>
+    </div>
+
+    <div class="relative z-10">
+        
+        <nav class="w-full glass-panel fixed top-0 z-50 px-6 py-4 border-b-0 border-white/5">
+            <div class="max-w-7xl mx-auto flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-gradient-to-tr from-brand-primary to-brand-accent rounded-xl flex items-center justify-center shadow-lg shadow-brand-primary/20">
+                        <i class="fa-solid fa-staff-snake text-white text-lg"></i>
+                    </div>
+                    <span class="text-xl font-bold tracking-tight text-white">DRS <span class="text-brand-primary">AI</span></span>
+                </div>
+                <button onclick="loadAll()" class="px-5 py-2 rounded-full border border-white/10 hover:bg-white/5 hover:border-brand-primary/30 transition-all text-sm font-medium flex items-center gap-2 group">
+                    <i class="fa-solid fa-database group-hover:text-brand-primary transition-colors"></i> Database
+                </button>
+            </div>
+        </nav>
+
+        <section class="pt-32 pb-16 px-6 max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
+            <div class="space-y-8">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-primary/10 border border-brand-primary/20 text-brand-primary text-xs font-bold uppercase tracking-wider">
+                    <span class="w-2 h-2 rounded-full bg-brand-primary animate-pulse"></span>
+                    System Online
+                </div>
+                <h1 class="text-5xl md:text-7xl font-bold leading-tight text-white">
+                    <span class="gradient-text"></span><br>Drug Analysis
+                </h1>
+                <p class="text-lg text-slate-400 max-w-lg leading-relaxed">
+                    Pharmaceutical recommendation engine. Analyze symptoms or search our comprehensive database with precision.
+                </p>
+
+                <div class="glass-panel p-2 rounded-2xl max-w-xl shadow-2xl border border-white/10 relative overflow-hidden group">
+                    <div class="absolute -inset-1 bg-gradient-to-r from-brand-primary to-brand-accent opacity-20 blur transition duration-500 group-hover:opacity-40"></div>
+                    
+                    <div class="relative z-10 bg-brand-dark rounded-xl">
+                        <div class="flex p-1 bg-brand-card/50 rounded-xl mb-3 relative mx-2 mt-2">
+                            <div id="toggle-bg" class="absolute top-1 left-1 w-[calc(50%-4px)] h-[calc(100%-8px)] bg-brand-card rounded-lg shadow-sm transition-all duration-300 border border-white/5"></div>
+                            <button onclick="setSearchMode('name')" class="flex-1 relative z-10 py-2.5 text-sm font-semibold transition-colors text-white" id="btn-name">
+                                <i class="fa-solid fa-capsules mr-2"></i>Search Drug
+                            </button>
+                            <button onclick="setSearchMode('symptom')" class="flex-1 relative z-10 py-2.5 text-sm font-semibold transition-colors text-slate-400" id="btn-symptom">
+                                <i class="fa-solid fa-heart-pulse mr-2"></i>By Symptoms
+                            </button>
+                        </div>
+
+                        <div class="relative flex items-center bg-brand-card mx-2 mb-2 rounded-lg border border-white/5 focus-within:border-brand-primary/50 transition-colors">
+                            <i class="fa-solid fa-magnifying-glass text-slate-500 ml-4"></i>
+                            <input type="text" id="search-input" 
+                                class="w-full bg-transparent border-0 text-white px-4 py-4 focus:outline-none focus:ring-0 placeholder-slate-500" 
+                                placeholder="Enter drug name (e.g. Paracetamol)...">
+                            <button onclick="performSearch()" class="mr-2 bg-gradient-to-r from-brand-primary to-brand-accent text-white px-6 py-2 rounded-lg font-bold hover:shadow-lg hover:shadow-brand-primary/25 transition-all transform hover:scale-105 active:scale-95">
+                                SCAN
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="relative hidden lg:block h-[500px]">
+                <div class="absolute -inset-4 bg-gradient-to-tr from-brand-primary to-brand-accent opacity-20 blur-2xl rounded-full"></div>
+                <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80" 
+                     class="absolute inset-0 w-full h-full object-cover rounded-3xl opacity-90 border border-white/10 shadow-2xl" 
+                     onerror="this.src='https://placehold.co/600x600/0f172a/FFF?text=Medical+AI'"
+                     style="filter: contrast(1.1) saturate(1.1);"
+                     alt="Medical Tech">
+            </div>
+        </section>
+
+        <section class="max-w-7xl mx-auto px-6 pb-20">
+            <div class="flex items-center justify-between mb-8 border-b border-white/5 pb-4">
+                <h2 class="text-2xl font-bold flex items-center gap-2 text-white">
+                    <i class="fa-solid fa-microscope text-brand-primary"></i> Analysis Results
+                </h2>
+                <div class="text-sm text-slate-500 font-mono" id="result-count">System Ready</div>
+            </div>
+
+            <div id="loader" class="hidden flex-col items-center justify-center py-20">
+                <div class="loader-spinner mb-4"></div>
+                <p class="text-brand-primary animate-pulse font-mono text-sm">Processing Data...</p>
+            </div>
+
+            <div id="error-box" class="hidden p-6 rounded-xl bg-red-500/10 border border-red-500/20 text-center mb-8">
+                <i class="fa-solid fa-circle-exclamation text-red-500 text-2xl mb-2"></i>
+                <h3 class="text-white font-bold" id="error-title">Error</h3>
+                <p class="text-slate-400 text-sm" id="error-msg">Details here</p>
+            </div>
+
+            <div id="results-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                </div>
+        </section>
+    </div>
+
+    <div id="disclaimer-gate" class="fixed inset-0 z-[100] bg-brand-dark/95 backdrop-blur-xl flex items-center justify-center p-4">
+        <div class="max-w-md w-full glass-panel p-8 rounded-3xl text-center border border-brand-primary/30 shadow-2xl shadow-brand-primary/10 relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-primary to-brand-accent"></div>
+            
+            <div class="w-20 h-20 bg-brand-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-brand-primary/20">
+                <i class="fa-solid fa-user-doctor text-3xl text-brand-primary"></i>
+            </div>
+            <h2 class="text-3xl font-bold mb-2 text-white">HEALTHCARE INNOVATION on Drug Recommendation System</h2>
+            <p class="text-slate-500 mb-6 text-sm">Hackathon Team Members</p>
+            
+            <div class="w-fit mx-auto grid grid-cols-[auto_auto] gap-x-8 text-left text-slate-300 mb-8 font-mono text-sm bg-brand-dark/50 p-4 rounded-xl border border-white/5">
+                <div class="font-bold text-brand-primary">GAGANA R</div>    <div></div>
+                <div class="font-bold text-brand-primary">NITHIN C</div>       <div></div>
+                <div class="font-bold text-brand-primary">TRUPTHI NIRANJAN</div>  <div></div>
+                
+            </div>
+            
+            <button 
+                onclick="document.getElementById('disclaimer-gate').style.display='none'" 
+                class="w-full py-4 bg-gradient-to-r from-brand-primary to-brand-accent text-white rounded-xl font-bold text-lg hover:shadow-lg hover:shadow-brand-primary/25 hover:-translate-y-1 transition-all">
+                Procced
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // CONFIGURATION: Ensure this matches your Flask Port
+        const BASE_URL = "http://127.0.0.1:5000"; 
+        
+        let searchMode = 'name';
+        const resultsGrid = document.getElementById('results-grid');
+        const loader = document.getElementById('loader');
+        const searchInput = document.getElementById('search-input');
+        const resultCount = document.getElementById('result-count');
+        const errorBox = document.getElementById('error-box');
+
+        // --- 1. Toggle Search Mode ---
+        function setSearchMode(mode) {
+            searchMode = mode;
+            const toggleBg = document.getElementById('toggle-bg');
+            const btnName = document.getElementById('btn-name');
+            const btnSym = document.getElementById('btn-symptom');
+
+            if(mode === 'name') {
+                toggleBg.style.left = '4px';
+                btnName.classList.replace('text-slate-400', 'text-white');
+                btnSym.classList.replace('text-white', 'text-slate-400');
+                searchInput.placeholder = "Enter drug name (e.g. Paracetamol)...";
+            } else {
+                toggleBg.style.left = '50%';
+                btnName.classList.replace('text-white', 'text-slate-400');
+                btnSym.classList.replace('text-slate-400', 'text-white');
+                searchInput.placeholder = "Enter symptoms (e.g. Fever, Headache)...";
+            }
+        }
+
+        // --- 2. Create HTML for a single Card ---
+        function createCard(data, index) {
+            const name = data.Drug_Name || data.drug_name || "Unknown Drug";
+            const price = data.Price || data.price || "N/A";
+            const type = data.Type || data.type || "Rx";
+            const uses = data.Uses || data.uses || "Information unavailable";
+            
+            // Handle symptoms list safely
+            let symptoms = data.Symptoms_List || data.common_symptoms || [];
+            if (typeof symptoms === 'string') {
+                symptoms = symptoms.split(','); 
+            }
+
+            // Generate pill tags for symptoms
+            const tagsHtml = Array.isArray(symptoms) 
+                ? symptoms.slice(0, 3).map(s => `<span class="px-2 py-1 bg-brand-dark border border-white/10 rounded text-xs text-brand-primary font-mono">${s}</span>`).join('')
+                : '';
+
+            return `
+                <div class="glass-panel rounded-2xl overflow-hidden hover:border-brand-primary/50 transition-all duration-300 group opacity-0 translate-y-4 card-anim flex flex-col h-full">
+                    <div class="h-28 bg-gradient-to-r from-brand-primary to-brand-accent relative p-4 flex items-end">
+                        <div class="absolute inset-0 bg-brand-dark/20 mix-blend-multiply"></div>
+                        <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(white 1px, transparent 1px); background-size: 10px 10px;"></div>
+                        
+                        <div class="relative z-10 w-full flex justify-between items-end">
+                            <h3 class="text-xl font-bold text-white drop-shadow-md truncate w-3/4">${name}</h3>
+                            <span class="bg-brand-dark/40 backdrop-blur-md px-3 py-1 rounded-lg text-sm font-bold border border-white/10 text-white shadow-sm">₹${price}</span>
+                        </div>
+                    </div>
+                    <div class="p-5 space-y-4 flex-1 flex flex-col">
+                        <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-brand-primary">
+                            <i class="fa-solid fa-tag"></i> ${type}
+                        </div>
+                        
+                        <div class="space-y-2 flex-1">
+                            <div class="flex gap-3">
+                                <div class="w-6 h-6 rounded bg-brand-card flex items-center justify-center text-slate-400 shrink-0 mt-0.5 border border-white/5">
+                                    <i class="fa-solid fa-circle-info text-xs"></i>
+                                </div>
+                                <p class="text-sm text-slate-300 leading-relaxed line-clamp-3">${uses}</p>
+                            </div>
+                        </div>
+
+                        <div class="pt-4 border-t border-white/5 flex flex-wrap gap-2 mt-auto">
+                            ${tagsHtml}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- 3. Execute Search ---
+        async function performSearch() {
+            const query = searchInput.value.trim();
+            if (!query) {
+                alert("Please enter a drug name or symptom.");
+                return;
+            }
+
+            resultsGrid.innerHTML = '';
+            errorBox.classList.add('hidden');
+            loader.classList.remove('hidden');
+            resultCount.textContent = 'Analyzing...';
+
+            try {
+                let data = [];
+                
+                if (searchMode === 'name') {
+                    const resp = await fetch(`${BASE_URL}/drug_info?name=${encodeURIComponent(query)}`);
+                    if (!resp.ok) {
+                        if(resp.status === 404) throw new Error("Drug not found in database.");
+                        throw new Error("Server Error: " + resp.status);
+                    }
+                    const json = await resp.json();
+                    data = [json]; 
+                } else {
+                    const payload = { symptoms: query.split(',').map(s => s.trim()).filter(Boolean) };
+                    const resp = await fetch(`${BASE_URL}/recommend_drug`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (!resp.ok) throw new Error("Recommendation failed. Check backend.");
+                    const json = await resp.json();
+                    data = json.recommendations || [];
+                }
+
+                renderData(data);
+
+            } catch (err) {
+                console.error(err);
+                showError("Search Failed", err.message + ". Is your Python App running?");
+            } finally {
+                loader.classList.add('hidden');
+            }
+        }
+
+        // --- 4. Load Database ---
+        async function loadAll() {
+            resultsGrid.innerHTML = '';
+            errorBox.classList.add('hidden');
+            loader.classList.remove('hidden');
+            resultCount.textContent = 'Fetching Database...';
+
+            try {
+                const resp = await fetch(`${BASE_URL}/all_drugs`);
+                if (!resp.ok) throw new Error("Could not connect to database.");
+                const data = await resp.json();
+                renderData(data);
+            } catch(e) {
+                showError("Connection Error", "Is the Python server running on port 5000?");
+            } finally {
+                loader.classList.add('hidden');
+            }
+        }
+
+        // --- 5. Helper Functions ---
+        function renderData(data) {
+            if(!data || data.length === 0) {
+                resultsGrid.innerHTML = `<div class="col-span-full text-center text-slate-500 py-10 border border-white/5 rounded-2xl bg-brand-card/30">No matches found.</div>`;
+                resultCount.textContent = '0 Results';
+                return;
+            }
+
+            resultCount.textContent = `${data.length} Result${data.length !== 1 ? 's' : ''} Found`;
+            resultsGrid.innerHTML = data.map((item, index) => createCard(item, index)).join('');
+            
+            document.querySelectorAll('.card-anim').forEach((el, i) => {
+                setTimeout(() => {
+                    el.classList.remove('opacity-0', 'translate-y-4');
+                }, i * 100);
+            });
+        }
+
+        function showError(title, msg) {
+            const errTitle = document.getElementById('error-title');
+            const errMsg = document.getElementById('error-msg');
+            errTitle.textContent = title;
+            errMsg.textContent = msg;
+            errorBox.classList.remove('hidden');
+            resultCount.textContent = 'System Error';
+        }
+
+        searchInput.addEventListener('keypress', (e) => {
+            if(e.key === 'Enter') performSearch();
+        });
+
+    </script>
+</body>
+</html>
